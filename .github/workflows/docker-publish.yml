@@ -35,15 +35,18 @@ jobs:
         with:
           github-token: ${{ secrets.GIT_TOKEN }}
 
-      - name: Debug semantic release outputs
+      - name: Check semantic release outputs
         run: |
           echo "New release published: ${{ steps.semantic_release.outputs.new_release_published }}"
           echo "New version: ${{ steps.semantic_release.outputs.new_version }}"
 
       - name: Set new version environment variable
-        run: echo "NEW_VERSION=${{ steps.semantic_release.outputs.new_version }}" >> $GITHUB_ENV
+        if: steps.semantic_release.outputs.new_release_published == 'true'
+        run: |
+          echo "NEW_VERSION=${{ steps.semantic_release.outputs.new_version }}" >> $GITHUB_ENV
 
       - name: Debug new version
+        if: steps.semantic_release.outputs.new_release_published == 'true'
         run: echo "New version is $NEW_VERSION"
 
       - name: Build and push Docker image

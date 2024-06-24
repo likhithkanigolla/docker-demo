@@ -30,42 +30,33 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Install go-semantic-release
-        uses: go-semantic-release/action@v1
         id: semantic_release
+        uses: go-semantic-release/action@v1
         with:
           github-token: ${{ secrets.GIT_TOKEN }}
 
-      - name: Check semantic-release output
-        run: |
-          echo "New version: ${{ steps.semantic_release.outputs}}"
-          # if [[ -z "${{ steps.semantic_release.outputs.new_version }}" ]]; then
-          #   echo "No new version detected. Exiting..."
-          #   exit 1
-          # fi
+      - name: Set new version environment variable
+        run: echo "NEW_VERSION=${{ steps.semantic_release.outputs.new_version }}" >> $GITHUB_ENV
+
+      - name: Debug new version
+        run: echo "New version is $NEW_VERSION"
 
       - name: Build and push Docker image
-        # if: steps.semantic_release.outputs.new_release_published == 'true'
-        run: |
-          echo "New version: ${{ steps.semantic_release.outputs.new_version }}"
-          set -x
-          docker build -t likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }} .
-          docker build -t likhithkanigolla/learn-docker-tags:latest .
-          docker push likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }}
-          docker push likhithkanigolla/learn-docker-tags:latest
-
-      # - name: Build and push Docker image
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: . # Ensure this is the correct context
-      #     file: ./Dockerfile
-      #     push: true
-      #     tags: likhithkanigolla/learn-docker-tags:${{ secrets.VERSION }}, likhithkanigolla/learn-docker-tags
+        if: steps.semantic_release.outputs.new_release_published == 'true'
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            likhithkanigolla/learn-docker-tags:${{ env.NEW_VERSION }}
+            likhithkanigolla/learn-docker-tags:latest
 
       - name: Create GitHub Release
         if: steps.semantic_release.outputs.new_release_published == 'true'
         uses: ncipollo/release-action@v1
         with:
-          name: Release ${{ steps.semantic_release.outputs.new_version }}
-          tag_name: ${{ steps.semantic_release.outputs.new_version }}
+          name: Release ${{ env.NEW_VERSION }}
+          tag_name: ${{ env.NEW_VERSION }}
           body: |
-            See the full release notes at: https://github.com/${{ github.repository }}/releases/tag/${{ steps.semantic_release.outputs.new_version }}
+            See the full release notes at: https://github.com/${{ github.repository }}/releases/tag/${{ env.NEW_VERSION }}

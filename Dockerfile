@@ -6,7 +6,7 @@ RUN apt-get update && \
     apt-get install -y curl
 
 # Copy all files from the current directory to the container
-COPY. /app
+COPY . /app
 
 # Set the working directory inside the container
 WORKDIR /app

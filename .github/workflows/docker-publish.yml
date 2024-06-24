@@ -32,16 +32,17 @@ jobs:
         with:
           github-token: ${{ secrets.GIT_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build Docker image
         if: steps.semantic_release.outputs.new_release_published == 'true'
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }}
-            likhithkanigolla/learn-docker-tags:latest
+        run: |
+          docker build -t likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }} .
+          docker build -t likhithkanigolla/learn-docker-tags:latest .
+
+      - name: Push Docker image to Docker Hub
+        if: steps.semantic_release.outputs.new_release_published == 'true'
+        run: |
+          docker push likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }}
+          docker push likhithkanigolla/learn-docker-tags:latest
 
       - name: Create GitHub Release
         if: steps.semantic_release.outputs.new_release_published == 'true'

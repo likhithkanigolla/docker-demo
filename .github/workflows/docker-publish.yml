@@ -35,6 +35,11 @@ jobs:
         with:
           github-token: ${{ secrets.GIT_TOKEN }}
 
+      - name: Debug semantic release outputs
+        run: |
+          echo "New release published: ${{ steps.semantic_release.outputs.new_release_published }}"
+          echo "New version: ${{ steps.semantic_release.outputs.new_version }}"
+
       - name: Set new version environment variable
         run: echo "NEW_VERSION=${{ steps.semantic_release.outputs.new_version }}" >> $GITHUB_ENV
 

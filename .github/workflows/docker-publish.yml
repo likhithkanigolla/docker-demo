@@ -35,23 +35,23 @@ jobs:
         with:
           github-token: ${{ secrets.GIT_TOKEN }}
 
-      # - name: Check semantic-release output
-      #   run: |
-      #     echo "New version: ${{ steps.semantic_release.outputs.new_version }}"
-      #     if [[ -z "${{ steps.semantic_release.outputs.new_version }}" ]]; then
-      #       echo "No new version detected. Exiting..."
-      #       exit 1
-      #     fi
+      - name: Check semantic-release output
+        run: |
+          echo "New version: ${{ steps.semantic_release.outputs}}"
+          # if [[ -z "${{ steps.semantic_release.outputs.new_version }}" ]]; then
+          #   echo "No new version detected. Exiting..."
+          #   exit 1
+          fi
 
-      # - name: Build and push Docker image
-      #   # if: steps.semantic_release.outputs.new_release_published == 'true'
-      #   run: |
-      #     echo "New version: ${{ steps.semantic_release.outputs.new_version }}"
-      #     set -x
-      #     docker build -t likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }} .
-      #     docker build -t likhithkanigolla/learn-docker-tags:latest .
-      #     docker push likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }}
-      #     docker push likhithkanigolla/learn-docker-tags:latest
+      - name: Build and push Docker image
+        # if: steps.semantic_release.outputs.new_release_published == 'true'
+        run: |
+          echo "New version: ${{ steps.semantic_release.outputs.new_version }}"
+          set -x
+          docker build -t likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }} .
+          docker build -t likhithkanigolla/learn-docker-tags:latest .
+          docker push likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }}
+          docker push likhithkanigolla/learn-docker-tags:latest
 
       # - name: Build and push Docker image
       #   uses: docker/build-push-action@v2

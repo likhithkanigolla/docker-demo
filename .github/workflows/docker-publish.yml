@@ -41,7 +41,7 @@ jobs:
           # if [[ -z "${{ steps.semantic_release.outputs.new_version }}" ]]; then
           #   echo "No new version detected. Exiting..."
           #   exit 1
-          fi
+          # fi
 
       - name: Build and push Docker image
         # if: steps.semantic_release.outputs.new_release_published == 'true'

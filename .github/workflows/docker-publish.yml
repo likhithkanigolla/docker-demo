@@ -35,22 +35,20 @@ jobs:
         with:
           github-token: ${{ secrets.GIT_TOKEN }}
 
-      - name: Check semantic release outputs
+      - name: Capture new version
+        id: capture_version
         run: |
-          echo "New release published: ${{ steps.semantic_release.outputs.new_release_published }}"
-          echo "New version: ${{ steps.semantic_release.outputs.new_version }}"
-
-      - name: Set new version environment variable
-        if: steps.semantic_release.outputs.new_release_published == 'true'
-        run: |
-          echo "NEW_VERSION=${{ steps.semantic_release.outputs.new_version }}" >> $GITHUB_ENV
+          # Extract the new version from the semantic release output
+          NEW_VERSION=$(cat .generated-go-semantic-release-changelog.md | grep -oP '(?<=## )\d+\.\d+\.\d+')
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version captured: $NEW_VERSION"
 
       - name: Debug new version
-        if: steps.semantic_release.outputs.new_release_published == 'true'
         run: echo "New version is $NEW_VERSION"
 
       - name: Build and push Docker image
-        if: steps.semantic_release.outputs.new_release_published == 'true'
+        if: steps.capture_version.outputs.new_version
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -61,7 +59,7 @@ jobs:
             likhithkanigolla/learn-docker-tags:latest
 
       - name: Create GitHub Release
-        if: steps.semantic_release.outputs.new_release_published == 'true'
+        if: steps.capture_version.outputs.new_version
         uses: ncipollo/release-action@v1
         with:
           name: Release ${{ env.NEW_VERSION }}

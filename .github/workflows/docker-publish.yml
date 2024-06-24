@@ -59,10 +59,10 @@ jobs:
             likhithkanigolla/learn-docker-tags:latest
 
       - name: Create GitHub Release
-        if: steps.capture_version.outputs.new_version
+        if: steps.semantic_release.outputs.new_release_published == 'true'
         uses: ncipollo/release-action@v1
         with:
-          name: Release ${{ env.NEW_VERSION }}
-          tag_name: ${{ env.NEW_VERSION }}
+          name: Release ${{ steps.semantic_release.outputs.new_version }}
+          tag_name: ${{ steps.semantic_release.outputs.new_version }}
           body: |
-            See the full release notes at: https://github.com/${{ github.repository }}/releases/tag/${{ env.NEW_VERSION }}
+            See the full release notes at: https://github.com/${{ github.repository }}/releases/tag/${{ steps.semantic_release.outputs.new_version }}

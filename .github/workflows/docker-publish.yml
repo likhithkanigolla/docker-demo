@@ -3,8 +3,8 @@ name: Push Docker Image to Docker Hub
 on:
   push:
     branches:
-      - main # or adjust to your specific branch or tagging strategy
-      
+      - main # Adjust to your specific branch or tagging strategy
+
 env:
   ACTIONS_RUNNER_DEBUG: true
 
@@ -37,15 +37,12 @@ jobs:
 
       - name: Build and push Docker image
         if: steps.semantic_release.outputs.new_release_published == 'true'
-        id: docker_build_push
         uses: docker/build-push-action@v2
         with:
-          context: .
+          context: . # Ensure this is the correct context
           file: ./Dockerfile
           push: true
-          tags: |
-            likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }}
-            likhithkanigolla/learn-docker-tags:latest
+          tags: likhithkanigolla/learn-docker-tags:${{ steps.semantic_release.outputs.new_version }}, likhithkanigolla/learn-docker-tags
 
       - name: Create GitHub Release
         if: steps.semantic_release.outputs.new_release_published == 'true'
